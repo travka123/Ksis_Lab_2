@@ -4,6 +4,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
+#define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
 int iResult;
@@ -52,6 +53,14 @@ int main()
 		WSACleanup();
 		return 1;
 	}
+
+	char sendbuf[DEFAULT_BUFLEN];
+	int sendbuflen = DEFAULT_BUFLEN;
+	do
+	{
+		gets_s(sendbuf, sendbuflen);
+		send(ConnectSocket, sendbuf, sendbuflen, 0);
+	} while (sendbuf[0]);
 
 	return 0;
 }

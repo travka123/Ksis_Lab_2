@@ -4,6 +4,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
+#define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
 int iResult;
@@ -67,6 +68,26 @@ int main() {
 		WSACleanup();
 		return 1;
 	}
+
+	char recvbuf[DEFAULT_BUFLEN];
+	int recvbuflen = DEFAULT_BUFLEN;
+	do
+	{
+		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+		if (iResult > 0)
+		{
+			printf("Bytes received: %d\n", iResult);
+			printf("Message: %s\n", recvbuf);
+		}
+		else if (iResult == 0)
+		{
+			printf("Connection closed\n");
+		}
+		else
+		{
+			printf("recv failed: %d\n", WSAGetLastError());
+		}
+	} while (iResult > 0);
 
 	return 0;
 }
