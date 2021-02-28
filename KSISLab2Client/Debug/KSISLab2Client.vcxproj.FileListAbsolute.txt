@@ -1,0 +1,2 @@
+D:\KSISLabs\KSISLab2\KSISLab2Client\Debug\KSISLab2Client.exe
+D:\KSISLabs\KSISLab2\KSISLab2Client\Debug\KSISLab2Client.pdb
