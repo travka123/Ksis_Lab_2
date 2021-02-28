@@ -1,2 +1,3 @@
 ﻿  Source.c
+D:\KSISLabs\KSISLab2\KSISLab2Server\Source.c(85,40): warning C4133: функция: несовместимые типы - из "int *" в "char *"
   KSISLab2Server.vcxproj -> D:\KSISLabs\KSISLab2\KSISLab2Server\Debug\KSISLab2Server.exe

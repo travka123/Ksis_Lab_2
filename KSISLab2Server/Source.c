@@ -1,11 +1,18 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
+#include <time.h> 
 
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
+#define DEFAULT_SEED 1
+
+int GetNextRandomValue(int last)
+{
+	return last * last * 97 + last;
+}
 
 int iResult;
 
@@ -69,15 +76,16 @@ int main() {
 		return 1;
 	}
 
-	char recvbuf[DEFAULT_BUFLEN];
-	int recvbuflen = DEFAULT_BUFLEN;
+	int recData;
+	int countTCP = 0;
+	time_t time;
+	time = clock();
 	do
 	{
-		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+		iResult = recv(ClientSocket, &recData, sizeof(int), 0);
 		if (iResult > 0)
 		{
-			printf("Bytes received: %d\n", iResult);
-			printf("Message: %s\n", recvbuf);
+			countTCP++;
 		}
 		else if (iResult == 0)
 		{
@@ -88,6 +96,16 @@ int main() {
 			printf("recv failed: %d\n", WSAGetLastError());
 		}
 	} while (iResult > 0);
+	closesocket(ClientSocket);
+	closesocket(ListenSocket);
+	//////////////////////////////////////////////
 
+	double secondsTCP = (double)(clock() - time) / CLOCKS_PER_SEC;
+	double millisecondsTCP = secondsTCP * 1000;
+	printf("\n");
+	printf("TCP messages count: %d\n", countTCP);
+	printf("TCP transfer time: %f milliseconds\n", millisecondsTCP);
+	printf("TCP message size: %d\n", sizeof(recData));
+	printf("TCP speed: %f Mbit/s\n", (double)countTCP * sizeof(recData) / 1024 / 1024 / secondsTCP);
 	return 0;
 }

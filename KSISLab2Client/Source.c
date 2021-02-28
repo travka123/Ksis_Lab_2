@@ -6,6 +6,12 @@
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
+#define DEFAULT_SEED 1
+
+int GetNextRandomValue(int last)
+{
+	return last * last * 97 + last;
+}
 
 int iResult;
 
@@ -54,13 +60,29 @@ int main()
 		return 1;
 	}
 
-	char sendbuf[DEFAULT_BUFLEN];
-	int sendbuflen = DEFAULT_BUFLEN;
-	do
+	int data = GetNextRandomValue(DEFAULT_SEED);
+	for (int i = 0; i < 1000000; i++)
 	{
-		gets_s(sendbuf, sendbuflen);
-		send(ConnectSocket, sendbuf, sendbuflen, 0);
-	} while (sendbuf[0]);
+		send(ConnectSocket, &data, sizeof(int), 0);
+		data = GetNextRandomValue(data);
+	}
 
+	iResult = shutdown(ConnectSocket, SD_SEND);
+	if (iResult == SOCKET_ERROR) {
+		wprintf(L"shutdown failed with error: %d\n", WSAGetLastError());
+		closesocket(ConnectSocket);
+		WSACleanup();
+		return 1;
+	}
+
+	iResult = closesocket(ConnectSocket);
+	if (iResult == SOCKET_ERROR) {
+		wprintf(L"close failed with error: %d\n", WSAGetLastError());
+		WSACleanup();
+		return 1;
+	}
+
+	WSACleanup();
+	
 	return 0;
 }
