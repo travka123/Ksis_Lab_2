@@ -1,3 +1,9 @@
 ﻿  Source.c
-D:\KSISLabs\KSISLab2\KSISLab2Client\Source.c(66,28): warning C4133: функция: несовместимые типы - из "int *" в "const char *"
+D:\KSISLabs\KSISLab2\KSISLab2Client\Source.c(83,28): warning C4133: функция: несовместимые типы - из "int *" в "const char *"
+D:\KSISLabs\KSISLab2\KSISLab2Client\Source.c(91,34): warning C4133: функция: несовместимые типы - из "int *" в "const char *"
+D:\KSISLabs\KSISLab2\KSISLab2Client\Source.c(92,34): warning C4133: функция: несовместимые типы - из "int *" в "const char *"
+D:\KSISLabs\KSISLab2\KSISLab2Client\Source.c(93,34): warning C4133: функция: несовместимые типы - из "int *" в "const char *"
+D:\KSISLabs\KSISLab2\KSISLab2Client\Source.c(99,11): warning C4098: CloseSocket: функция типа "void", возвращающая значение
+D:\KSISLabs\KSISLab2\KSISLab2Client\Source.c(106,11): warning C4098: CloseSocket: функция типа "void", возвращающая значение
+D:\KSISLabs\KSISLab2\KSISLab2Client\Source.c(113,41): warning C4133: функция: несовместимые типы - из "int *" в "const char *"
   KSISLab2Client.vcxproj -> D:\KSISLabs\KSISLab2\KSISLab2Client\Debug\KSISLab2Client.exe

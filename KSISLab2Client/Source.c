@@ -1,6 +1,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
+#include <locale.h>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -10,28 +11,40 @@
 
 int GetNextRandomValue(int last)
 {
-	return last * last * 97 + last;
+	int rw = last * last * 97 + last;
+	return (rw == 0) ? (rw++) : (rw);
 }
 
-int iResult;
+WSADATA wsaData;
+int pakegeForSendCount;
 
-int main()
+void InitWinsock()
 {
-	WSADATA wsaData;
-	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
 		printf("WSAStartup failed: %d\n", iResult);
-		return 1;
+		exit(1);
 	}
+}
 
+SOCKET SetConnection(int protocol)
+{
 	ADDRINFO hints;
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
+	switch (protocol)
+	{
+	case IPPROTO_TCP:
+		hints.ai_socktype = SOCK_STREAM;
+		break;
+	case IPPROTO_UDP:
+		hints.ai_socktype = SOCK_DGRAM;
+		break;
+	}
+	hints.ai_protocol = protocol;
 
 	ADDRINFO* result;
-	iResult = getaddrinfo("localhost", DEFAULT_PORT, &hints, &result);
+	int iResult = getaddrinfo("localhost", DEFAULT_PORT, &hints, &result);
 	if (iResult != 0) {
 		printf("getaddrinfo failed: %d\n", iResult);
 		WSACleanup();
@@ -57,17 +70,28 @@ int main()
 	if (ConnectSocket == INVALID_SOCKET) {
 		printf("Unable to connect to server!\n");
 		WSACleanup();
-		return 1;
+		exit(1);
 	}
+	return ConnectSocket;
+}
 
+void RandomSend(SOCKET ConnectSocket)
+{
 	int data = GetNextRandomValue(DEFAULT_SEED);
-	for (int i = 0; i < 1000000; i++)
+	for (int i = 0; i < pakegeForSendCount; i++)
 	{
 		send(ConnectSocket, &data, sizeof(int), 0);
 		data = GetNextRandomValue(data);
 	}
+}
 
-	iResult = shutdown(ConnectSocket, SD_SEND);
+void CloseSocket(SOCKET ConnectSocket)
+{
+	int closesignal = 0;
+	send(ConnectSocket, &closesignal, sizeof(int), 0);
+	send(ConnectSocket, &closesignal, sizeof(int), 0);
+	send(ConnectSocket, &closesignal, sizeof(int), 0);
+	int iResult = shutdown(ConnectSocket, SD_SEND);
 	if (iResult == SOCKET_ERROR) {
 		wprintf(L"shutdown failed with error: %d\n", WSAGetLastError());
 		closesocket(ConnectSocket);
@@ -81,8 +105,37 @@ int main()
 		WSACleanup();
 		return 1;
 	}
+}
+
+
+void SetPackegeCount(SOCKET ConnectSocket)
+{
+	send(ConnectSocket, &pakegeForSendCount, sizeof(int), 0);
+}
+
+int iResult;
+
+int main()
+{
+	setlocale(LC_ALL, "Russian");
+	InitWinsock();
+
+	SOCKET ConnectSocket = SetConnection(IPPROTO_TCP);
+
+	printf("¬ведите кол-во пакетов дл€ отправки: ");
+	scanf_s("%d", &pakegeForSendCount);
+	SetPackegeCount(ConnectSocket);
+
+	RandomSend(ConnectSocket);
+	CloseSocket(ConnectSocket);
+	printf("TCP пакеты отправлены\n");
+	system("pause");
+	
+	ConnectSocket = SetConnection(IPPROTO_UDP);
+	RandomSend(ConnectSocket);
+	CloseSocket(ConnectSocket);
+	printf("UDP пакеты отправлены\n");
 
 	WSACleanup();
-	
 	return 0;
 }
